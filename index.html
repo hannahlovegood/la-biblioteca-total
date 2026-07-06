@@ -60,6 +60,9 @@
   .spine:hover,.spine:focus{ color:var(--gold-bright); border-color:rgba(201,162,39,.4); outline:none; }
   .spine.cif{ font-family:var(--serif); letter-spacing:.42em; color:var(--paper-faint); }
   .spine.thing{ color:var(--gold); }
+  .spine .spine-zh{ display:block; font-family:var(--han); font-weight:300; font-size:.78rem;
+    color:var(--paper-faint); letter-spacing:.1em; margin-top:.05em; }
+  .spine:hover .spine-zh,.spine:focus .spine-zh{ color:var(--paper-dim); }
 
   /* la vitrina — la galería de una cosa del universo */
   #thing{ margin:1.6em auto 0; max-width:34em; text-align:left; }
@@ -208,19 +211,19 @@
   </div>
 
   <nav id="passages">
-    <button class="door" data-act="next">→ galería contigua</button>
-    <button class="door" data-act="up">↟ escalera, arriba</button>
-    <button class="door" data-act="down">↡ escalera, abajo</button>
-    <button class="door" data-act="mirror" id="mirrorBtn">≋ el espejo</button>
+    <button class="door" data-act="next">→ galería contigua · 隔壁回廊</button>
+    <button class="door" data-act="up">↟ escalera, arriba · 上楼</button>
+    <button class="door" data-act="down">↡ escalera, abajo · 下楼</button>
+    <button class="door" data-act="mirror" id="mirrorBtn">≋ el espejo · 镜子</button>
     <button class="door" data-act="index">✦ el índice de las cosas · 万物索引</button>
     <form id="catalog">
       <input id="q" type="text" autocomplete="off" spellcheck="false"
-        placeholder="consultar el catálogo… (prueba: aleph, tigre, 迷宫, o tu propio nombre)">
+        placeholder="查询目录 consultar el catálogo…（试试：阿莱夫、tigre、迷宫，或你自己的名字）">
     </form>
   </nav>
 </div>
 
-<div id="aleph-point" title="¿el Aleph?">·</div>
+<div id="aleph-point" title="¿el Aleph? · 阿莱夫？">·</div>
 
 <div id="threshold">
   <div class="es">Siempre imaginé que el Paraíso sería algún tipo de biblioteca.</div>
@@ -248,7 +251,7 @@
   <div id="aleph-coda">
     <div class="es">…lloré, porque mis ojos habían visto ese objeto secreto y conjetural cuyo nombre usurpan los hombres pero que ningún hombre ha mirado: el inconcebible universo.</div>
     <div class="doubt">那是真的阿莱夫吗？ ¿Era ese el verdadero Aleph?</div>
-    <div class="back">— toca para volver —</div>
+    <div class="back">— toca para volver · 触摸即返 —</div>
   </div>
 </div>
 
@@ -588,8 +591,18 @@ function buildShelves(){
     const li=document.createElement("li");
     const b=document.createElement("button");
     b.className="spine"+(it.kind==="cif"?" cif":"")+(it.kind==="thing"?" thing":"");
-    if(it.kind==="real") b.textContent=it.q.es.split(/[,.;:]/)[0];
-    else if(it.kind==="thing") b.textContent="✦ "+it.th.es;
+    if(it.kind==="real"){
+      const segs=it.q.es.split(/[,.;:]/);
+      b.textContent=segs[0].length<8 && segs[1] ? segs[0]+","+segs[1] : segs[0];
+      const z=document.createElement("span"); z.className="spine-zh";
+      z.textContent=it.q.zh.split(/[，。；：]/)[0]; b.appendChild(z);
+    }
+    else if(it.kind==="thing") b.textContent="✦ "+it.th.es+" · "+it.th.zh;
+    else if(it.kind==="inv"){
+      b.textContent=it.t;
+      const z=document.createElement("span"); z.className="spine-zh";
+      z.textContent="未写之书"; b.appendChild(z);
+    }
     else b.textContent=it.t;
     b.onclick=()=>{
       if(it.kind==="real") setLectern(quoteHTML(it.q));
@@ -624,7 +637,7 @@ function enterGallery(reuse){
     buildShelves();
     setLectern(quoteHTML(pick(Q)));
     $("#stage").classList.remove("mirrored");
-    $("#mirrorBtn").textContent="≋ el espejo";
+    $("#mirrorBtn").textContent="≋ el espejo · 镜子";
     stage.classList.remove("fading");
   },850);
 }
@@ -638,7 +651,7 @@ function showThing(id){
     $("#room").style.display="none";
     $("#shelves").style.display="none";
     $("#stage").classList.remove("mirrored");
-    $("#mirrorBtn").textContent="≋ el espejo";
+    $("#mirrorBtn").textContent="≋ el espejo · 镜子";
     $("#coord").textContent="✦ "+t.es+" · "+t.zh;
     $("#thing-cls").textContent=CLS[t.cls];
     $("#thing-body").textContent=t.body;
@@ -751,7 +764,7 @@ $("#passages").addEventListener("click",e=>{
   if(act==="mirror"){
     const st=$("#stage"); st.classList.toggle("mirrored");
     const on=st.classList.contains("mirrored");
-    $("#mirrorBtn").textContent= on? "≋ volver del espejo" : "≋ el espejo";
+    $("#mirrorBtn").textContent= on? "≋ volver del espejo · 走出镜子" : "≋ el espejo · 镜子";
     if(on) setLectern(quoteHTML(Q[1])); // los espejos son abominables
   } else if(act==="index"){ openIndex(); }
   else enterGallery(false);
